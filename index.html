@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Тестовое задание</title>
+    <head>
+        <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
+    </head>
+    <body>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <script type="text/javascript">
+
+            function search_log () {
+
+                $('[name=warning]').html (null).hide();
+                $('[name=log]').html('');
+
+                let q = $('[name=q]').val();
+
+                if (!q || q == '') {
+                    $('[name=q]').focus();
+                    return alert ('Необходимо ввести адрес получателя');
+                }
+
+                $.ajax({
+                    type        : 'POST',
+                    url         : 'http://192.168.56.12:1234',
+                    data        : {q: q},
+                    dataType    : 'json',
+                    contentType : 'application/x-www-form-urlencoded; charset=UTF-8',
+                    success     : function (data) {
+                        if (data.error) return alert (data.error);
+
+                        if (data.warning) {
+                            $('[name=warning]').html ("<p><font color='blue'>" + data.warning + '!</font></p>').show()
+                        } else {
+                        }
+
+                        $('[name=log]').html((data.log || []).map (i => '<p>' + i.line + '</p>'));
+
+                    },
+                    error: function (data) {
+                        return alert ('Ошибка получения данных. Обратитесь в техническую поддержку.');
+                    }
+                });
+            }
+
+            function clear_log () {
+                $('[name=q]').val(null);
+                $('[name=log]').html(null);
+                $('[name=warning]').html (null);
+                $('[name=warning]').hide();
+            }
+        </script>
+
+        <form>
+            <label>Адрес получателя:
+                <input name="q" />
+            </label>
+            <input type="button" value="Искать" onclick='search_log ()' />
+            <input type="button" value="Очистить" onclick='clear_log ()' />
+        </form>
+        <span name=warning style="display:none;"></span>
+        <span name=log></span>
+    </body>
+</html>
